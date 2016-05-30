@@ -19,7 +19,7 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "EditDeleteServ", description = "login servlet", urlPatterns = { "/EditDeleteServ" })
 public class EditDeleteServlet extends HttpServlet {
     private static final long serialVersionUID = 15648974312L;
-    private UserDao userDao;
+    private final UserDao userDao;
 
     /**
      * @see HttpServlet#HttpServlet()
@@ -27,15 +27,6 @@ public class EditDeleteServlet extends HttpServlet {
     public EditDeleteServlet() {
         super();
         userDao = new JdbcUserDao();
-    }
-
-    /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        response.getWriter().append("Served at: doGet:").append(request.getContextPath());
     }
 
     /**

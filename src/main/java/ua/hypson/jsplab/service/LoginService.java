@@ -9,7 +9,7 @@ import java.util.List;
 
 public class LoginService {
 
-  private UserDao userDao;
+  private final UserDao userDao;
 
   public LoginService() {
     userDao = new JdbcUserDao();
@@ -18,9 +18,9 @@ public class LoginService {
   public User login(String login, String password) {
     User fetched = userDao.findByLogin(login);
     if (null == fetched) {
-      throw new InvalidUserInputException("No user in system with such login");
+      throw new InvalidUserInputException("Bad credentials");
     } else if (!password.equals(fetched.getPassword())) {
-      throw new InvalidUserInputException("You have entered incorrect password");
+      throw new InvalidUserInputException("Bad credentials");
     }
 
     return fetched;

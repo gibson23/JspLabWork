@@ -30,12 +30,11 @@ public class Role {
 
   @Override
   public String toString() {
-    String builder = "Role [id=" +
+    return "Role [id=" +
             id +
             ", name=" +
             name +
             "]";
-    return builder;
   }
 
   @Override

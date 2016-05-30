@@ -18,9 +18,9 @@ import ua.hypson.jdbclab.entity.Role;
 import ua.hypson.jdbclab.factory.ConnectionFactory;
 
 public class JdbcRoleDaoTest extends DBTestCase {
-  private RoleDao roleDao;
-  private Properties connectionProperties;
-  private static ConnectionFactory factory;
+  private final RoleDao roleDao;
+  private final Properties connectionProperties;
+  private static final ConnectionFactory factory;
 
   @Override
   protected IDataSet getDataSet() throws Exception {
@@ -40,7 +40,7 @@ public class JdbcRoleDaoTest extends DBTestCase {
       stmt.execute("INSERT INTO ROLE (PK_ROLE_ID, NAME) VALUES (0, 'default')");
       stmt.execute("DROP TABLE IF EXISTS USER");
       stmt.execute("CREATE TABLE IF NOT EXISTS USER "
-          + "(PK_USER_ID BIGINT PRIMARY KEY, LOGIN VARCHAR(255) NOT NULL UNIQUE, PASSWORD VARCHAR(255) NOT NULL, EMAIL VARCHAR(255) NOT NULL UNIQUE,"
+          + "(PK_USER_ID BIGINT PRIMARY KEY AUTO_INCREMENT, LOGIN VARCHAR(255) NOT NULL UNIQUE, PASSWORD VARCHAR(255) NOT NULL, EMAIL VARCHAR(255) NOT NULL UNIQUE,"
           + " FIRSTNAME VARCHAR(255), LASTNAME VARCHAR(255), BIRTHDAY DATE, FK_ROLE_ID BIGINT)");
 
     } catch (SQLException e) {

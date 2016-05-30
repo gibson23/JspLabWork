@@ -30,8 +30,10 @@ import ua.hypson.jsplab.service.LoginService;
 public class LoginServlet extends HttpServlet {
   private static final long serialVersionUID = 789456123L;
   private LoginService loginService;
+  private Role adminRole;
 
-  static {
+  @Override
+  public void init() throws ServletException {
     ConnectionFactory factory = ConnectionFactory.getFactory("h2.properties");
     Connection conn = factory.createConnection();
     Statement stmt;
@@ -39,15 +41,15 @@ public class LoginServlet extends HttpServlet {
     UserDao userDao = new JdbcUserDao();
     try {
       stmt = conn.createStatement();
-        stmt.execute("DROP TABLE IF EXISTS ROLE");
-        stmt.execute("DROP TABLE IF EXISTS USER");
+      stmt.execute("DROP TABLE IF EXISTS ROLE");
+      stmt.execute("DROP TABLE IF EXISTS USER");
       stmt.execute(
           "CREATE TABLE IF NOT EXISTS ROLE " + "(PK_ROLE_ID BIGINT PRIMARY KEY, NAME VARCHAR(255) NOT NULL UNIQUE)");
 
       stmt.execute("CREATE TABLE IF NOT EXISTS USER "
-          + "(PK_USER_ID BIGINT PRIMARY KEY, LOGIN VARCHAR(255) NOT NULL UNIQUE, PASSWORD VARCHAR(255) NOT NULL, EMAIL VARCHAR(255) NOT NULL UNIQUE,"
+          + "(PK_USER_ID BIGINT PRIMARY KEY AUTO_INCREMENT, LOGIN VARCHAR(255) NOT NULL UNIQUE, PASSWORD VARCHAR(255) NOT NULL, EMAIL VARCHAR(255) NOT NULL UNIQUE,"
           + " FIRSTNAME VARCHAR(255), LASTNAME VARCHAR(255), BIRTHDAY DATE, FK_ROLE_ID BIGINT)");
-      Role adminRole = new Role();
+      adminRole = new Role();
       adminRole.setId(1L);
       adminRole.setName("admin");
 
@@ -57,14 +59,11 @@ public class LoginServlet extends HttpServlet {
       roleDao.create(adminRole);
       roleDao.create(userRole);
       @SuppressWarnings("deprecation")
-      User admin = User.createUser(User.counter, "admin", "admin", "admin@my.app", "Vasiliy", "Zhar",
-          new Date(87, 7, 23), adminRole);
-      User vika = User.createUser(User.counter, "vika", "vika", "vika@my.app", "Vika", "Zhar", new Date(97, 7, 23),
-          userRole);
-      User masha = User.createUser(User.counter, "masha", "masha", "masha@my.app", "Masha", "Zhar", new Date(85, 7, 23),
-          userRole);
-      User inna = User.createUser(User.counter, "inna", "inna", "inna@my.app", "Inna", "Zhar", new Date(77, 7, 23),
-          userRole);
+      User admin = User.createNewUser("admin", "admin", "admin@my.app", "Vasiliy", "Zhar", new Date(87, 7, 23),
+          adminRole);
+      User vika = User.createNewUser("vika", "vika", "vika@my.app", "Vika", "Zhar", new Date(97, 7, 23), userRole);
+      User masha = User.createNewUser("masha", "masha", "masha@my.app", "Masha", "Zhar", new Date(85, 7, 23), userRole);
+      User inna = User.createNewUser("inna", "inna", "inna@my.app", "Inna", "Zhar", new Date(77, 7, 23), userRole);
       userDao.create(admin);
       userDao.create(inna);
       userDao.create(vika);
@@ -73,7 +72,7 @@ public class LoginServlet extends HttpServlet {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-
+    loginService = new LoginService();
   }
 
   /**
@@ -81,7 +80,7 @@ public class LoginServlet extends HttpServlet {
    */
   public LoginServlet() {
     super();
-    loginService = new LoginService();
+
   }
 
   /**
@@ -97,7 +96,7 @@ public class LoginServlet extends HttpServlet {
     }
     User user = (User) session.getAttribute("user");
 
-    if (user.getRole().getName().equals("admin")) {
+    if (user.getRole().equals(adminRole)) {
       List<User> users = loginService.getAllUsers();
       request.setAttribute("users", users);
       request.getRequestDispatcher("adminhome.jsp").forward(request, response);
@@ -119,7 +118,7 @@ public class LoginServlet extends HttpServlet {
     } else {
       user = (User) session.getAttribute("user");
     }
-    if (user.getRole().getName() == "admin") {
+    if (user.getRole().equals(adminRole)) {
       List<User> users = loginService.getAllUsers();
       request.setAttribute("users", users);
       request.getRequestDispatcher("adminhome.jsp").forward(request, response);

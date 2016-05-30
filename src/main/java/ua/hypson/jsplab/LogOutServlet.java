@@ -32,14 +32,4 @@ public class LogOutServlet extends HttpServlet {
         request.getSession().invalidate();
         request.getRequestDispatcher("login.jsp").forward(request, response);
     }
-
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-            IOException {
-        // TODo Auto-generated method stub
-        response.getWriter().append("Served at: doPost:").append(request.getContextPath());
-    }
 }

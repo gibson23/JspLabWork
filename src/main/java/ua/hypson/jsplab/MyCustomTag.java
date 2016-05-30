@@ -1,7 +1,7 @@
 package ua.hypson.jsplab;
 
 import ua.hypson.jdbclab.entity.User;
-import ua.hypson.jsplab.service.BirthdayToAgeConverter;
+import ua.hypson.jsplab.service.DateUtils;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -47,7 +47,7 @@ public class MyCustomTag implements Tag {
     public int doStartTag() throws JspException {
 
         JspWriter jspWriter = pageContext.getOut();
-        BirthdayToAgeConverter ageConverter = new BirthdayToAgeConverter();
+        DateUtils ageConverter = new DateUtils();
 
         try {
             jspWriter.println("<table border=\"1\" style=\"width:100%\">\n" +

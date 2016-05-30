@@ -4,7 +4,6 @@ import java.sql.Date;
 
 public class User {
 
-    public static Long counter = 1L;
     private Long id;
     private String login;
     private String password;
@@ -14,12 +13,23 @@ public class User {
     private Date birthday;
     private Role role;
 
-    public static User createUser(Long id, String login, String password, String email, String firstName, String
-            lastName,
-                                  Date birthday, Role role) {
-        counter++;
+    public static User createUserFromDB(Long id, String login, String password, String email, String firstName, String
+            lastName, Date birthday, Role role) {
         User user = new User();
         user.setId(id);
+        user.setLogin(login);
+        user.setPassword(password);
+        user.setEmail(email);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setBirthday(birthday);
+        user.setRole(role);
+        return user;
+    }
+
+    public static User createNewUser(String login, String password, String email, String firstName, String
+            lastName, Date birthday, Role role) {
+        User user = new User();
         user.setLogin(login);
         user.setPassword(password);
         user.setEmail(email);
@@ -96,7 +106,7 @@ public class User {
 
     @Override
     public String toString() {
-        String builder = "User [id=" +
+        return "User [id=" +
                 id +
                 ", login=" +
                 login +
@@ -113,7 +123,6 @@ public class User {
                 ", role=" +
                 role +
                 "]";
-        return builder;
     }
 
     @Override

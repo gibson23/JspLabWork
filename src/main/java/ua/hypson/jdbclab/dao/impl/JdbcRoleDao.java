@@ -11,7 +11,7 @@ import ua.hypson.jdbclab.factory.ConnectionFactory;
 
 public class JdbcRoleDao implements RoleDao {
 
-  private ConnectionFactory factory;
+  private final ConnectionFactory factory;
 
   public JdbcRoleDao() {
     factory = ConnectionFactory.getFactory();

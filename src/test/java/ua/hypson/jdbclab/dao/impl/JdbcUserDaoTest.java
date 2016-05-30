@@ -12,6 +12,7 @@ import org.dbunit.PropertiesBasedJdbcDatabaseTester;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.ext.h2.H2DataTypeFactory;
 import org.junit.Test;
@@ -24,10 +25,10 @@ import ua.hypson.jdbclab.factory.ConnectionFactory;
 
 public class JdbcUserDaoTest extends DBTestCase {
 
-  private UserDao userDao;
-  private RoleDao roleDao;
-  private Properties connectionProperties;
-  private static ConnectionFactory factory;
+  private final UserDao userDao;
+  private final RoleDao roleDao;
+  private final Properties connectionProperties;
+  private static final ConnectionFactory factory;
 
   @Override
   protected IDataSet getDataSet() throws Exception {
@@ -47,7 +48,7 @@ public class JdbcUserDaoTest extends DBTestCase {
       stmt.execute("INSERT INTO ROLE (PK_ROLE_ID, NAME) VALUES (0, 'default')");
       stmt.execute("DROP TABLE IF EXISTS USER");
       stmt.execute("CREATE TABLE IF NOT EXISTS USER "
-          + "(PK_USER_ID BIGINT PRIMARY KEY, LOGIN VARCHAR(255) NOT NULL UNIQUE, PASSWORD VARCHAR(255) NOT NULL, EMAIL VARCHAR(255) NOT NULL UNIQUE,"
+          + "(PK_USER_ID BIGINT PRIMARY KEY AUTO_INCREMENT, LOGIN VARCHAR(255) NOT NULL UNIQUE, PASSWORD VARCHAR(255) NOT NULL, EMAIL VARCHAR(255) NOT NULL UNIQUE,"
           + " FIRSTNAME VARCHAR(255), LASTNAME VARCHAR(255), BIRTHDAY DATE, FK_ROLE_ID BIGINT)");
 
     } catch (SQLException e) {
@@ -77,14 +78,12 @@ public class JdbcUserDaoTest extends DBTestCase {
   public void testUserDao() throws Exception {
     User extractedUser = userDao.findByEmail("igor@igor");
     assertEquals("Igorek", extractedUser.getFirstName());
-    assertEquals(10L, extractedUser.getId().longValue());
     assertEquals("igor", extractedUser.getLogin());
     assertEquals("12345", extractedUser.getPassword());
     assertEquals("Nikolaev", extractedUser.getLastName());
     assertEquals("1961-02-20", extractedUser.getBirthday().toString());
 
     extractedUser = userDao.findByLogin("igor");
-    assertEquals(10L, (long) extractedUser.getId());
     assertEquals("Igorek", extractedUser.getFirstName());
 
   }
@@ -92,7 +91,7 @@ public class JdbcUserDaoTest extends DBTestCase {
   @Test(timeout = 100)
   public void testUserCreate() throws Exception {
     @SuppressWarnings("deprecation")
-    User addingUser = User.createUser(User.counter, "gri", "poiu", "grisha2000@mail.ru", "Grigoriy", "Skovoroda",
+    User addingUser = User.createNewUser("gri", "poiu", "grisha2000@mail.ru", "Grigoriy", "Skovoroda",
         new Date(20, 5, 5), Role.getDefaultRole());
 
     userDao.create(addingUser);
@@ -120,11 +119,14 @@ public class JdbcUserDaoTest extends DBTestCase {
     IDataSet databaseDataSet = getConnection().createDataSet();
     ITable actualTable = databaseDataSet.getTable("USER");
 
+
     IDataSet expectedDataSet = new FlatXmlDataSetBuilder().build(this.getClass().getClassLoader().getResourceAsStream
             ("afterset.xml"));
     ITable expectedTable = expectedDataSet.getTable("USER");
 
-    Assertion.assertEquals(expectedTable, actualTable);
+    ITable filteredTable = DefaultColumnFilter.includedColumnsTable(actualTable, expectedTable.getTableMetaData()
+            .getColumns());
+    Assertion.assertEquals(expectedTable, filteredTable);
   }
 
 }
